@@ -42,7 +42,7 @@ export default function Questionnaire({ onSubmit, error }) {
       {/* ── Hero ── */}
       <div className="questionnaire__hero">
         <div className="questionnaire__eyebrow">Network Builder Tool</div>
-        <h1 className="questionnaire__title">Build Your Network, Step by Step</h1>
+        <h1 className="questionnaire__title">Build Your Network</h1>
         <p className="questionnaire__subtitle">
           Pick a platform and I'll walk you through the whole build — management,
           VLANs, routing, NAT, firewall, HA, and VPN — with the exact CLI I'd
