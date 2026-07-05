@@ -2,11 +2,11 @@
  * Summary.jsx — The final recap screen.
  *
  * Shows:
- *   1. Track card — chosen platform, tagline, gear, cert focus, phase count
+ *   1. Track card — chosen platform, tagline, gear, best-for, step count
  *   2. Network diagram — the topology for this track
- *   3. Command cheat-sheet — every phase and the command to verify it
- *   4. Doc / study links
- *   5. Actions — start over or jump back to a specific phase
+ *   3. Command cheat-sheet — every step and the command to verify it
+ *   4. Doc / reference links
+ *   5. Actions — start over or jump back to a specific step
  */
 
 import NetworkDiagram from "./NetworkDiagram.jsx";
@@ -31,13 +31,13 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
             </div>
           </div>
           <div className="cost-card">
-            <div className="cost-card__label">Cert Focus</div>
+            <div className="cost-card__label">Best For</div>
             <div className="cost-card__value" style={{ fontSize: "13px", color: "var(--text)", lineHeight: 1.5 }}>
-              {track_info.cert}
+              {track_info.focus}
             </div>
           </div>
           <div className="cost-card">
-            <div className="cost-card__label">Phases</div>
+            <div className="cost-card__label">Steps</div>
             <div className="cost-card__value">{steps.length}</div>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
         <table className="stack-table">
           <thead>
             <tr>
-              <th>Phase</th>
+              <th>Step</th>
               <th>Where it applies</th>
               <th>Verify with</th>
             </tr>
@@ -65,7 +65,7 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
                 key={step.id}
                 style={{ cursor: "pointer" }}
                 onClick={() => onReviewStep(step.order - 1)}
-                title={`Click to review Phase ${step.order}: ${step.title}`}
+                title={`Click to review Step ${step.order}: ${step.title}`}
               >
                 <td className="stack-table__step">{step.order}. {step.title}</td>
                 <td className="stack-table__product">{step.gear}</td>
@@ -76,7 +76,7 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
         </table>
 
         <p style={{ fontSize: "12px", color: "var(--text-dim)", marginTop: "var(--space-3)", fontFamily: "var(--mono)" }}>
-          ↑ Click any row to jump back to that phase's full CLI and notes
+          ↑ Click any row to jump back to that step's full CLI and notes
         </p>
       </div>
 
@@ -93,7 +93,7 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
 
       {/* ── 5. Sources ── */}
       <div>
-        <h2 className="summary__section-title">Docs & Study Resources</h2>
+        <h2 className="summary__section-title">Docs & References</h2>
         <div className="sources-grid">
           {sources.map((source) => (
             <a
@@ -114,7 +114,7 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
       {/* ── 6. Actions ── */}
       <div className="summary__actions">
         <button className="btn btn--ghost" onClick={() => onReviewStep(0)}>
-          ← Review Phases
+          ← Review Steps
         </button>
         <button className="btn btn--secondary" onClick={onReset}>
           Switch Track

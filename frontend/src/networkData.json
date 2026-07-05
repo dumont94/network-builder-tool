@@ -3,18 +3,18 @@
     "cisco": {
       "id": "cisco",
       "name": "Cisco",
-      "tagline": "IOS / IOS-XE — the CCNA-track build",
+      "tagline": "IOS / IOS-XE — Catalyst switching and ISR routing",
       "gear": "Catalyst switches · ISR / IOS-XE routers · ASA / Firepower",
-      "cert": "Maps to CCNA 200-301 exam topics",
-      "description": "Stand up a network the Cisco way: an IOS-XE router at the edge, a Catalyst L3 switch for the LAN, VLANs and SVIs for segmentation, OSPF internally, PAT to the internet, ACLs and Layer-2 hardening for security, STP + EtherChannel + HSRP for redundancy, and IKEv2 IPsec for site-to-site. Every phase includes the exact CLI, the show commands to prove it works, and the pitfalls that cost you points on the exam and outages in production."
+      "focus": "Enterprise LAN/WAN — router + switch build",
+      "description": "Build a network the Cisco way: an IOS-XE router at the edge, a Catalyst L3 switch for the LAN, VLANs and SVIs for segmentation, OSPF internally, PAT to the internet, ACLs and Layer-2 hardening for security, STP + EtherChannel + HSRP for redundancy, and IKEv2 IPsec for site-to-site. Every step includes the exact CLI, the show commands to prove it works, and the pitfalls that cause real-world outages."
     },
     "fortinet": {
       "id": "fortinet",
       "name": "Fortinet",
-      "tagline": "FortiOS — the FortiGate-centric build",
+      "tagline": "FortiOS — the consolidated FortiGate edge",
       "gear": "FortiGate NGFW · FortiSwitch · FortiAP",
-      "cert": "Maps to Fortinet FCP / NSE 4 exam topics",
-      "description": "Stand up a network the Fortinet way: a FortiGate NGFW as the all-in-one edge (routing, NAT, firewall, VPN, DHCP), FortiSwitch for the LAN via FortiLink, VLAN sub-interfaces for segmentation, OSPF internally, policy-based NAT and VIPs to the internet, firewall policies with UTM security profiles, FGCP for high availability, and route-based IPsec plus SSL-VPN for remote access. Every phase includes the FortiOS config-tree CLI, the get/diagnose commands to prove it works, and the pitfalls that bite in the real world."
+      "focus": "Consolidated NGFW edge — single appliance",
+      "description": "Build a network the Fortinet way: a FortiGate NGFW as the all-in-one edge (routing, NAT, firewall, VPN, DHCP), FortiSwitch for the LAN via FortiLink, VLAN sub-interfaces for segmentation, OSPF internally, policy-based NAT and VIPs to the internet, firewall policies with UTM security profiles, FGCP for high availability, and route-based IPsec plus SSL-VPN for remote access. Every step includes the FortiOS config-tree CLI, the get/diagnose commands to prove it works, and the pitfalls that bite in the real world."
     }
   },
   "steps": [
@@ -24,7 +24,7 @@
       "title": "Plan & IP Addressing",
       "icon": "plan",
       "what": "A network build starts on paper, not on a console. Before you touch a device you decide the topology, the IP addressing scheme, the VLAN map, and a naming convention. A clean, room-to-grow address plan is the single biggest predictor of whether the rest of the build goes smoothly.",
-      "why": "Every later phase — VLANs, routing, DHCP, NAT, firewall rules, VPN selectors — references these subnets. Get the plan right once and everything downstream is mechanical. Get it wrong (overlapping subnets, no growth room, a flat network) and you re-address later under pressure, usually during an outage.",
+      "why": "Every later step — VLANs, routing, DHCP, NAT, firewall rules, VPN selectors — references these subnets. Get the plan right once and everything downstream is mechanical. Get it wrong (overlapping subnets, no growth room, a flat network) and you re-address later under pressure, usually during an outage.",
       "tracks": {
         "cisco": {
           "gear": "Design artifact — produce this before you console into anything.",
@@ -48,7 +48,7 @@
             "Sizing every VLAN /24 out of habit when guest/IoT could be smaller and data larger",
             "No documented naming standard, so device configs drift and nobody can read them later"
           ],
-          "study": "CCNA leans hard on subnetting: be able to convert prefix to mask to wildcard in your head, know the RFC1918 ranges (10/8, 172.16/12, 192.168/16), and understand why VLAN 1 and the native VLAN are hardening concerns."
+          "study": "Stay fluent converting prefix to mask to wildcard, keep everything inside the RFC1918 ranges (10/8, 172.16/12, 192.168/16), and leave VLAN 1 and the native VLAN unused — they are common attack defaults."
         },
         "fortinet": {
           "gear": "Design artifact — produce this before you log into the FortiGate.",
@@ -72,7 +72,7 @@
             "Not planning which physical port becomes the FortiLink to the FortiSwitch",
             "Sizing guest identically to data when guest should be isolated and small"
           ],
-          "study": "FCP/NSE 4 expects fluency with RFC1918, VLAN sub-interface addressing, and the FortiGate model that routing and firewall policy are separate decisions: a route makes traffic possible, a policy makes it permitted."
+          "study": "Work inside the RFC1918 ranges and keep the FortiGate model in mind: routing and firewall policy are separate decisions — a route makes traffic possible, a policy makes it permitted."
         }
       }
     },
@@ -116,7 +116,7 @@
             "Leaving 'transport input telnet' or 'all' on the vty lines",
             "Configuring everything, then losing it all to a reload because you never ran 'write memory'"
           ],
-          "study": "Classic CCNA sequence: SSH needs a hostname, a domain-name, and an RSA key of at least 768 bits. Know the difference between 'enable secret' (privileged EXEC) and line passwords, and that privilege 15 = full access."
+          "study": "SSH needs three things before it will start: a hostname, a domain-name, and an RSA key of at least 768 bits. 'enable secret' protects privileged EXEC, and privilege 15 grants full access."
         },
         "fortinet": {
           "gear": "FortiGate — console or the default 192.168.1.99 mgmt IP for first access.",
@@ -149,7 +149,7 @@
             "Setting 'allowaccess' with http/telnet, or enabling admin access on the WAN interface",
             "No trusthost, so the admin account is reachable from any source IP"
           ],
-          "study": "FCP essentials: the FortiOS config tree (config, edit, set, next, end), 'trusthost' to restrict admin sources, 'admin-sport' to move the GUI off 443, and why administrative access should never be enabled on an untrusted interface."
+          "study": "Core FortiOS habits: the config tree (config, edit, set, next, end), 'trusthost' to restrict admin sources, 'admin-sport' to move the GUI off 443, and never enabling administrative access on an untrusted interface."
         }
       }
     },
@@ -192,7 +192,7 @@
             "Native VLAN mismatch between the two ends of a trunk",
             "Enabling PortFast on a trunk or uplink port (invites loops)"
           ],
-          "study": "Know access vs trunk, 802.1Q tagging, the native (untagged) VLAN, and that DTP can auto-negotiate trunks — which is why you hardcode 'switchport mode' rather than leaving it dynamic."
+          "study": "Access vs trunk, 802.1Q tagging, and the native (untagged) VLAN are the fundamentals. Hardcode 'switchport mode' so DTP can't auto-negotiate a trunk you didn't intend."
         },
         "fortinet": {
           "gear": "FortiGate VLAN sub-interfaces (over a hardware switch or FortiLink to FortiSwitch).",
@@ -224,7 +224,7 @@
             "VLAN ID on the FortiGate sub-interface not matching the tag on the FortiSwitch port",
             "Overlapping the sub-interface subnet with an existing interface"
           ],
-          "study": "On FortiGate a VLAN is a sub-interface bound to a physical/aggregate parent and its own vlanid; the sub-interface IP becomes that VLAN's gateway. FortiSwitch VLANs are pushed over FortiLink from the FortiGate."
+          "study": "On FortiGate a VLAN is a sub-interface bound to a physical/aggregate parent with its own vlanid; the sub-interface IP becomes that VLAN's gateway. FortiSwitch VLANs are pushed over FortiLink from the FortiGate."
         }
       }
     },
@@ -262,9 +262,9 @@
           "pitfalls": [
             "Forgetting 'ip routing' — SVIs come up but the switch won't route between them",
             "Not excluding the gateway/infra range, so DHCP leases out 10.10.10.1 to a client",
-            "Assuming inter-VLAN reachability is fine security — you still want ACLs (next phases)"
+            "Assuming inter-VLAN reachability is fine security — you still want ACLs (next steps)"
           ],
-          "study": "Two ways to route between VLANs: SVIs on an L3 switch (this example) or router-on-a-stick (sub-interfaces with 'encapsulation dot1q'). Know both, and that 'ip dhcp excluded-address' must protect your static ranges."
+          "study": "Two ways to route between VLANs: SVIs on an L3 switch (this example) or router-on-a-stick (sub-interfaces with 'encapsulation dot1q'). Always protect static ranges with 'ip dhcp excluded-address'."
         },
         "fortinet": {
           "gear": "FortiGate — routes between its own interfaces; DHCP server per VLAN.",
@@ -294,7 +294,7 @@
             "Binding the DHCP server to the wrong sub-interface",
             "DNS-service set to 'default' when the FortiGate isn't allowed out to resolve"
           ],
-          "study": "The FortiGate is inherently a router between its interfaces, but every inter-VLAN flow is governed by firewall policy. DHCP is configured per interface under 'config system dhcp server'."
+          "study": "The FortiGate routes between its own interfaces, but every inter-VLAN flow still needs a firewall policy. DHCP is configured per interface under 'config system dhcp server'."
         }
       }
     },
@@ -329,7 +329,7 @@
             "Mismatched area numbers between neighbors — no adjacency forms",
             "Forgetting 'default-information originate', so internal routers never learn the default route"
           ],
-          "study": "OSPF is a CCNA cornerstone: wildcard masks, areas (all touching area 0), router-id selection order (manual, then highest loopback, then highest interface), 'passive-interface' to stop hellos on user VLANs, and administrative distance 110."
+          "study": "OSPF essentials: wildcard masks in network statements, every area touching area 0, router-id order (manual, then highest loopback, then highest interface), 'passive-interface' on user VLANs, and administrative distance 110."
         },
         "fortinet": {
           "gear": "FortiGate.",
@@ -364,7 +364,7 @@
             "OSPF 'redistribute static' needed if you want the default advertised to neighbors",
             "Two equal static routes creating unintended ECMP — set 'priority'/'distance' to steer"
           ],
-          "study": "FortiOS routing: static routes carry a distance and a priority (both influence selection), OSPF is configured under a single 'config router ospf' tree with area and network sub-tables, and redistribution is explicit."
+          "study": "FortiOS static routes carry a distance and a priority (both affect selection); OSPF lives under one 'config router ospf' tree with area and network sub-tables. Redistribution is explicit."
         }
       }
     },
@@ -400,7 +400,7 @@
             "A NAT ACL that is too broad and overlaps VPN traffic (needs NAT exemption later)",
             "Confusing the inside-local vs inside-global address in troubleshooting"
           ],
-          "study": "'overload' = PAT (port address translation). Know the four NAT address types (inside/outside by local/global), the difference between dynamic PAT and static NAT, and that NAT order-of-operations matters relative to routing and crypto."
+          "study": "'overload' = PAT (port address translation). Keep the four NAT address types straight (inside/outside by local/global), know dynamic PAT vs static NAT, and mind NAT's order of operations relative to routing and crypto."
         },
         "fortinet": {
           "gear": "FortiGate — NAT lives in the firewall policy and in VIPs.",
@@ -441,7 +441,7 @@
             "Creating a VIP but no policy that uses the VIP as the destination address",
             "Mixing policy-NAT and central-NAT mode expectations"
           ],
-          "study": "FortiGate does policy-based NAT by default: SNAT is 'set nat enable' (optionally with IP pools), DNAT is a VIP referenced as the dstaddr of a firewall policy. Central NAT is the alternative model — know when each applies."
+          "study": "FortiGate does policy-based NAT by default: SNAT is 'set nat enable' (optionally with IP pools), DNAT is a VIP referenced as the dstaddr of a firewall policy. Central NAT is the alternative model."
         }
       }
     },
@@ -480,7 +480,7 @@
             "Applying an ACL in the wrong direction (in vs out) relative to the interface",
             "Enabling DHCP snooping without trusting the uplink port toward the real DHCP server"
           ],
-          "study": "Extended ACLs match source+dest+protocol+port; every ACL ends in an implicit 'deny any'. Pair with L2 controls: port-security, DHCP snooping, and Dynamic ARP Inspection — all recurring CCNA security topics."
+          "study": "Extended ACLs match source+dest+protocol+port and always end in an implicit 'deny any'. Pair them with L2 controls: port-security, DHCP snooping, and Dynamic ARP Inspection."
         },
         "fortinet": {
           "gear": "FortiGate — firewall policies with UTM security profiles.",
@@ -518,7 +518,7 @@
             "Enabling 'utm-status' but forgetting to attach the AV/IPS profiles",
             "Relying on the implicit deny without an explicit deny/log policy for visibility"
           ],
-          "study": "FortiGate evaluates policies top-down, first match wins, with an implicit deny at the end. Security profiles (AntiVirus, IPS, Web Filter, Application Control) attach to a policy; know flow-based vs proxy-based inspection and how 'diagnose debug flow' traces a packet's fate."
+          "study": "FortiGate evaluates policies top-down, first match wins, with an implicit deny at the end. Security profiles (AntiVirus, IPS, Web Filter, Application Control) attach to a policy, and 'diagnose debug flow' shows a packet's fate."
         }
       }
     },
@@ -641,7 +641,7 @@
             "Mismatched proposals, DH group, or PSK between the two ends",
             "No NAT exemption for VPN traffic, so packets get PATed instead of encrypted"
           ],
-          "study": "IPsec has two phases: IKE (Phase 1) builds the secure management channel, IPsec (Phase 2) protects the data. Know transform sets, the role of the crypto ACL as 'interesting traffic', and IKEv1 vs IKEv2 differences."
+          "study": "IPsec has two phases: IKE (Phase 1) builds the secure channel, IPsec (Phase 2) protects the data. Mind transform sets and the crypto ACL as 'interesting traffic'; IKEv2 is preferred over IKEv1."
         },
         "fortinet": {
           "gear": "FortiGate — route-based IPsec + SSL-VPN portal.",
@@ -682,7 +682,7 @@
             "Phase 1/Phase 2 proposal or DH-group mismatch with the peer",
             "Phase 2 selectors (src/dst subnet) not matching the far end"
           ],
-          "study": "FortiGate prefers route-based (interface-mode) IPsec: the tunnel becomes a virtual interface you route and policy over. Know phase1 vs phase2 parameters, and that SSL-VPN (web or tunnel mode) is the usual remote-access method."
+          "study": "FortiGate prefers route-based (interface-mode) IPsec: the tunnel becomes a virtual interface you route and policy over. SSL-VPN (web or tunnel mode) is the usual remote-access method."
         }
       }
     },
@@ -719,7 +719,7 @@
             "SNMP community left as 'public' / RW — a trivial reconnaissance and attack vector",
             "Ignoring err-disabled ports (show interfaces status err-disabled) after port-security trips"
           ],
-          "study": "Master 'show ip interface brief' as your first-look command, ping/traceroute for reachability, syslog severity levels 0-7, SNMP v2c vs v3 (v3 adds auth+encryption), and CDP/LLDP for neighbor discovery."
+          "study": "'show ip interface brief' is your first-look command; ping/traceroute for reachability; syslog severity levels 0-7; SNMP v2c vs v3 (v3 adds auth+encryption); and CDP/LLDP for neighbor discovery."
         },
         "fortinet": {
           "gear": "FortiGate + FortiAnalyzer/syslog collector.",
@@ -753,21 +753,16 @@
             "Leaving 'diagnose debug flow' or 'diagnose sniffer' running after troubleshooting (CPU + noise)",
             "SNMP community reachable from any host instead of a locked-down collector"
           ],
-          "study": "Know the three FortiOS command families: 'get' (state), 'show' (config), 'diagnose' (deep troubleshooting). 'diagnose debug flow' traces a packet through the policy engine; FortiView and FortiAnalyzer provide the long-term visibility SNMP alone can't."
+          "study": "Three FortiOS command families: 'get' (state), 'show' (config), 'diagnose' (deep troubleshooting). 'diagnose debug flow' traces a packet through the policy engine; FortiView and FortiAnalyzer add the long-term visibility SNMP alone can't."
         }
       }
     }
   ],
   "sources": [
     {
-      "vendor": "Cisco Learning Network (CCNA)",
-      "url": "https://learningnetwork.cisco.com",
-      "note": "Official CCNA 200-301 study community, exam topics, and practice resources"
-    },
-    {
-      "vendor": "Cisco IOS Command Reference",
+      "vendor": "Cisco IOS-XE Configuration Guides",
       "url": "https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/series.html",
-      "note": "Authoritative IOS-XE command syntax and configuration guides"
+      "note": "Authoritative IOS-XE feature configuration guides and command references"
     },
     {
       "vendor": "Fortinet Documentation Library",
@@ -775,14 +770,14 @@
       "note": "FortiOS admin guides, CLI reference, and the FortiGate cookbook"
     },
     {
-      "vendor": "Fortinet Training Institute (NSE/FCP)",
-      "url": "https://training.fortinet.com",
-      "note": "Free NSE 1-3 and paid FCP certification tracks with hands-on labs"
+      "vendor": "Fortinet Community Knowledge Base",
+      "url": "https://community.fortinet.com",
+      "note": "Configuration how-tos and troubleshooting articles from Fortinet TAC"
     },
     {
       "vendor": "Cisco Packet Tracer",
       "url": "https://www.netacad.com/courses/packet-tracer",
-      "note": "Free network simulator — lab every phase in this guide before touching real gear"
+      "note": "Free network simulator — model and test a build before deploying it"
     },
     {
       "vendor": "RFC 1918 (Private Address Space)",

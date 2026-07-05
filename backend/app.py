@@ -1,10 +1,10 @@
 """
-app.py — Flask API for the Network Build Study Guide.
+app.py — Flask API for the Network Builder Tool.
 
 Routes:
   GET  /api/health   — liveness check (useful for Docker/k8s health probes)
   GET  /api/tracks   — list available platform tracks (cisco, fortinet)
-  POST /api/build    — accepts a track choice, returns the full study guide
+  POST /api/build    — accepts a track choice, returns the full build
 
 Design decisions:
   - CORS is enabled for all origins in development. In production, restrict
@@ -47,7 +47,7 @@ def tracks():
 @app.route("/api/build", methods=["POST"])
 def build():
     """
-    Accept a track choice and return the complete study guide.
+    Accept a track choice and return the complete build.
 
     Request body (JSON):
       { "vendor": "cisco" | "fortinet" }
@@ -55,7 +55,7 @@ def build():
     Response (JSON):
       {
         "track":      "cisco" | "fortinet",
-        "track_info": { name, tagline, gear, cert, description },
+        "track_info": { name, tagline, gear, focus, description },
         "steps":      [ { id, order, title, icon, what, why, gear,
                           cli, verify, pitfalls, study } x 10 ],
         "sources":    [ { vendor, url, note } ... ],

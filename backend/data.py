@@ -1,5 +1,5 @@
 """
-data.py — Loads the network study-guide dataset.
+data.py — Loads the network builder dataset.
 
 The canonical content lives in frontend/src/networkData.json so the React app
 (which imports it directly) and this Flask API never drift apart. This module
@@ -7,8 +7,8 @@ just reads that file and exposes the pieces the API needs.
 
 Dataset shape:
   tracks  — { cisco: {...}, fortinet: {...} }  platform metadata
-  steps   — 10 build phases, each with per-track cli/verify/pitfalls/study
-  sources — vendor doc + study links
+  steps   — 10 build steps, each with per-track cli/verify/pitfalls/notes
+  sources — vendor doc + reference links
 """
 
 import json

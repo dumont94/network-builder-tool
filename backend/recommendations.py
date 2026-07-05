@@ -1,8 +1,8 @@
 """
-recommendations.py — Assembles the study-guide payload for a chosen track.
+recommendations.py — Assembles the build payload for a chosen track.
 
 The tool takes a single input: the vendor track (cisco | fortinet). This module
-flattens each build phase down to the selected track's guidance so the API
+flattens each build step down to the selected track's guidance so the API
 response never exposes the nested tracks structure. Mirrors the client-side
 logic in frontend/src/recommendations.js.
 """
@@ -14,13 +14,13 @@ VALID_TRACKS = list(TRACKS.keys())  # ["cisco", "fortinet"]
 
 
 def build_recommendation(vendor: str) -> dict:
-    """Assemble a complete study-guide payload for the frontend/API.
+    """Assemble a complete build payload for the frontend/API.
 
     Returns a dict containing:
       track       — the selected track ID
-      track_info  — metadata about that track (name, tagline, gear, cert, desc)
-      steps       — 10 build phases with the track-specific cli/verify/etc.
-      sources     — vendor doc + study links
+      track_info  — metadata about that track (name, tagline, gear, focus, desc)
+      steps       — 10 build steps with the track-specific cli/verify/etc.
+      sources     — vendor doc + reference links
     """
     track_info = TRACKS[vendor]
 

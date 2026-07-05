@@ -71,8 +71,8 @@ export default function App() {
         <div className="app-header__logo">
           <div className="app-header__dot" />
           <div>
-            <div className="app-header__title">Network Build Study Guide</div>
-            <div className="app-header__sub">stand up a network, phase by phase</div>
+            <div className="app-header__title">Network Builder Tool</div>
+            <div className="app-header__sub">build your network, step by step</div>
           </div>
         </div>
         {trackLabel && (

@@ -1,10 +1,10 @@
 /**
  * Questionnaire.jsx — The entry screen.
  *
- * One decision drives the whole guide: which platform are you building on,
+ * One decision drives the whole build: which platform are you building on,
  * Cisco (IOS / IOS-XE) or Fortinet (FortiOS)? The rest of the tool is a
  * step-by-step, CLI-first walkthrough of standing up a network on that
- * platform, written to double as a study guide (CCNA / Fortinet NSE).
+ * platform.
  *
  * To add a track: add an entry to TRACKS below and a matching "tracks" key
  * in networkData.json.
@@ -18,12 +18,12 @@ const TRACKS = [
   {
     id: "cisco",
     label: "Cisco",
-    desc: "IOS / IOS-XE · Catalyst switches · ISR routers — the CCNA-track build",
+    desc: "IOS / IOS-XE · Catalyst switches · ISR routers · ASA / Firepower",
   },
   {
     id: "fortinet",
     label: "Fortinet",
-    desc: "FortiOS · FortiGate NGFW · FortiSwitch — the FortiGate-centric build",
+    desc: "FortiOS · FortiGate NGFW · FortiSwitch · FortiAP",
   },
 ];
 
@@ -41,15 +41,15 @@ export default function Questionnaire({ onSubmit, error }) {
     <div className="questionnaire">
       {/* ── Hero ── */}
       <div className="questionnaire__hero">
-        <div className="questionnaire__eyebrow">Network Build Study Guide</div>
-        <h1 className="questionnaire__title">Stand Up a Network, Phase by Phase</h1>
+        <div className="questionnaire__eyebrow">Network Builder Tool</div>
+        <h1 className="questionnaire__title">Build Your Network, Step by Step</h1>
         <p className="questionnaire__subtitle">
-          Pick a platform and walk the full build — management, VLANs, routing,
-          NAT, firewall, HA, and VPN — with the real CLI, the commands to verify
-          each phase, and the pitfalls that cost you points and uptime. Built as
-          a study guide for network engineers.
+          Pick a platform and I'll walk you through the whole build — management,
+          VLANs, routing, NAT, firewall, HA, and VPN — with the exact CLI I'd
+          run, the commands to verify each step, and the pitfalls I've learned to
+          avoid. Everything here is how I actually stand a network up.
         </p>
-        <p className="questionnaire__byline">Built by Nigel Dumont</p>
+        <p className="questionnaire__byline">Built by Nigel Dumont · Network Engineer</p>
       </div>
 
       {/* ── Error ── */}
@@ -87,11 +87,11 @@ export default function Questionnaire({ onSubmit, error }) {
         <div className="security-banner">
           <div className="security-banner__icon">🖧</div>
           <div>
-            <div className="security-banner__title">Same 10 phases, either platform</div>
+            <div className="security-banner__title">Same 10 steps, either platform</div>
             <div className="security-banner__body">
               This walks a single-site build in real deployment order. Both tracks
-              cover identical concepts — only the CLI and product names change — so
-              you can compare Cisco IOS and FortiOS side by side by running it twice.
+              cover the same ground — only the CLI and product names change — so you
+              can build it on Cisco IOS or FortiOS and compare the two side by side.
             </div>
           </div>
         </div>

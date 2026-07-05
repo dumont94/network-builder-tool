@@ -1,13 +1,13 @@
 /**
- * StepCard.jsx — Renders a single build phase as a study-guide entry.
+ * StepCard.jsx — Renders a single build step.
  *
  * Sections, color-coded so a reader can scan quickly:
- *   Blue   — Concept (what this phase is)
+ *   Blue   — Concept (what this step is)
  *   Amber  — Where it fits in the build (why it matters)
  *   Purple — Configuration (the vendor CLI, in a monospace code block)
  *   Green  — Verify it works (show / get / diagnose commands)
  *   Red    — Common pitfalls (the mistakes that break it)
- *   Gray   — Study notes (cert-relevant context: CCNA / Fortinet NSE)
+ *   Gray   — Field notes (practitioner context worth knowing)
  *
  * CLI arrays render as code blocks. Lines beginning with "!" (Cisco) or
  * "#" (annotation) are treated as comments and dimmed.
@@ -19,7 +19,7 @@ export default function StepCard({ step, total }) {
 
       {/* ── Header ── */}
       <div className="step-card__header">
-        <span className="step-card__num">Phase {step.order} of {total}</span>
+        <span className="step-card__num">Step {step.order} of {total}</span>
         <h2 className="step-card__title">{step.title}</h2>
       </div>
 
@@ -53,8 +53,8 @@ export default function StepCard({ step, total }) {
         </ul>
       </Section>
 
-      {/* ── Study notes ── */}
-      <Section modifier="alts" icon="✱" title="Study Notes">
+      {/* ── Field notes ── */}
+      <Section modifier="alts" icon="✱" title="Field Notes">
         <p className="section__text">{step.study}</p>
       </Section>
 

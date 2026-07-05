@@ -1,8 +1,8 @@
 /**
- * recommendations.js — Assembles the study-guide payload for a chosen track.
+ * recommendations.js — Assembles the build payload for a chosen track.
  *
  * The tool has a single input: the vendor track (cisco | fortinet). This
- * module reads the pre-built networkData.json and flattens each build phase
+ * module reads the pre-built networkData.json and flattens each build step
  * down to the selected track's guidance so the UI never has to know about
  * the nested tracks structure.
  */
