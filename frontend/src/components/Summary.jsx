@@ -1,114 +1,99 @@
 /**
- * Summary.jsx — The final summary screen.
+ * Summary.jsx — The final recap screen.
  *
  * Shows:
- *   1. Path card — chosen path, tagline, Year 1 and recurring costs
- *   2. Network diagram — the topology for this path
- *   3. Full stack table — every component, its product, and approx. price
- *   4. Pricing disclaimer
- *   5. Sources — vendor links so the user can verify current pricing
- *   6. Actions — start over or go back to a specific step
+ *   1. Track card — chosen platform, tagline, gear, cert focus, phase count
+ *   2. Network diagram — the topology for this track
+ *   3. Command cheat-sheet — every phase and the command to verify it
+ *   4. Doc / study links
+ *   5. Actions — start over or jump back to a specific phase
  */
 
 import NetworkDiagram from "./NetworkDiagram.jsx";
 
 export default function Summary({ recommendation, onReset, onReviewStep }) {
-  const { path, path_info, steps, sources } = recommendation;
+  const { track, track_info, steps, sources } = recommendation;
 
   return (
     <div className="summary">
 
-      {/* ── 1. Path overview ── */}
+      {/* ── 1. Track overview ── */}
       <div className="summary__path-card">
-        <div className="summary__path-badge">Your selected build path</div>
-        <h1 className="summary__path-name">{path_info.name}</h1>
-        <p className="summary__path-tagline">{path_info.tagline}</p>
+        <div className="summary__path-badge">Your build track</div>
+        <h1 className="summary__path-name">{track_info.name}</h1>
+        <p className="summary__path-tagline">{track_info.tagline}</p>
 
         <div className="summary__costs">
           <div className="cost-card">
-            <div className="cost-card__label">Year 1 Total</div>
-            <div className="cost-card__value">{path_info.year1_cost}</div>
-          </div>
-          <div className="cost-card">
-            <div className="cost-card__label">Year 2+ (Recurring)</div>
-            <div className="cost-card__value">{path_info.recurring_cost}</div>
-          </div>
-          <div className="cost-card">
-            <div className="cost-card__label">Team Size</div>
-            <div className="cost-card__value" style={{ fontSize: "14px", color: "var(--text)" }}>
-              {path_info.audience}
+            <div className="cost-card__label">Platform</div>
+            <div className="cost-card__value" style={{ fontSize: "13px", color: "var(--text)", lineHeight: 1.5 }}>
+              {track_info.gear}
             </div>
+          </div>
+          <div className="cost-card">
+            <div className="cost-card__label">Cert Focus</div>
+            <div className="cost-card__value" style={{ fontSize: "13px", color: "var(--text)", lineHeight: 1.5 }}>
+              {track_info.cert}
+            </div>
+          </div>
+          <div className="cost-card">
+            <div className="cost-card__label">Phases</div>
+            <div className="cost-card__value">{steps.length}</div>
           </div>
         </div>
 
-        <p className="summary__path-desc">{path_info.description}</p>
+        <p className="summary__path-desc">{track_info.description}</p>
       </div>
 
       {/* ── 2. Network diagram ── */}
-      <NetworkDiagram pathId={path} />
+      <NetworkDiagram track={track} />
 
-      {/* ── 3. Full stack table ── */}
+      {/* ── 3. Command cheat-sheet ── */}
       <div>
-        <h2 className="summary__section-title">Full Component Stack</h2>
+        <h2 className="summary__section-title">Command Cheat-Sheet</h2>
         <table className="stack-table">
           <thead>
             <tr>
-              <th>Step</th>
-              <th>Component</th>
-              <th>Recommended Product</th>
-              <th>Approx. Price</th>
+              <th>Phase</th>
+              <th>Where it applies</th>
+              <th>Verify with</th>
             </tr>
           </thead>
           <tbody>
-            {steps.map((step) =>
-              step.products.map((product, pIdx) => (
-                <tr
-                  key={`${step.id}-${pIdx}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => onReviewStep(step.order - 1)}
-                  title={`Click to review Step ${step.order}: ${step.title}`}
-                >
-                  {/* Only show step label on the first product row */}
-                  {pIdx === 0 ? (
-                    <td
-                      className="stack-table__step"
-                      rowSpan={step.products.length}
-                    >
-                      {step.order}. {step.title}
-                    </td>
-                  ) : null}
-                  <td className="stack-table__component">
-                    <span style={{ fontSize: "11px", color: "var(--text-dim)", display: "block" }}>
-                      {product.role}
-                    </span>
-                  </td>
-                  <td className="stack-table__product">{product.name}</td>
-                  <td className="stack-table__price">{product.price}</td>
-                </tr>
-              ))
-            )}
+            {steps.map((step) => (
+              <tr
+                key={step.id}
+                style={{ cursor: "pointer" }}
+                onClick={() => onReviewStep(step.order - 1)}
+                title={`Click to review Phase ${step.order}: ${step.title}`}
+              >
+                <td className="stack-table__step">{step.order}. {step.title}</td>
+                <td className="stack-table__product">{step.gear}</td>
+                <td className="stack-table__price">{step.verify[0]}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        {/* Hint to click rows */}
         <p style={{ fontSize: "12px", color: "var(--text-dim)", marginTop: "var(--space-3)", fontFamily: "var(--mono)" }}>
-          ↑ Click any row to review that step's full details
+          ↑ Click any row to jump back to that phase's full CLI and notes
         </p>
       </div>
 
-      {/* ── 4. Pricing disclaimer ── */}
+      {/* ── 4. Study reminder ── */}
       <div className="pricing-note">
-        <span className="pricing-note__icon">⚠</span>
+        <span className="pricing-note__icon">📖</span>
         <span>
-          All pricing is approximate as of 2026. Hardware and licensing costs change frequently —
-          always verify current pricing directly with vendors before purchasing.
-          Links to all vendor sites are in the Sources section below.
+          Commands target current IOS-XE and FortiOS syntax and are written for a
+          single-site lab. Model, version, and licensing differences apply —
+          always confirm against the vendor docs below, and lab it in a simulator
+          before production.
         </span>
       </div>
 
       {/* ── 5. Sources ── */}
       <div>
-        <h2 className="summary__section-title">Sources & Vendor Links</h2>
+        <h2 className="summary__section-title">Docs & Study Resources</h2>
         <div className="sources-grid">
           {sources.map((source) => (
             <a
@@ -129,10 +114,10 @@ export default function Summary({ recommendation, onReset, onReviewStep }) {
       {/* ── 6. Actions ── */}
       <div className="summary__actions">
         <button className="btn btn--ghost" onClick={() => onReviewStep(0)}>
-          ← Review Build Steps
+          ← Review Phases
         </button>
         <button className="btn btn--secondary" onClick={onReset}>
-          Start Over
+          Switch Track
         </button>
       </div>
 

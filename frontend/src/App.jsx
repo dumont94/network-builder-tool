@@ -59,9 +59,9 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Derive a short path label for the header badge
-  const pathLabel = recommendation
-    ? recommendation.path_info.name
+  // Derive a short track label for the header badge
+  const trackLabel = recommendation
+    ? `${recommendation.track_info.name} track`
     : null;
 
   return (
@@ -71,12 +71,12 @@ export default function App() {
         <div className="app-header__logo">
           <div className="app-header__dot" />
           <div>
-            <div className="app-header__title">Map Your Network Infrastructure</div>
-            <div className="app-header__sub">Infrastructure Builder</div>
+            <div className="app-header__title">Network Build Study Guide</div>
+            <div className="app-header__sub">stand up a network, phase by phase</div>
           </div>
         </div>
-        {pathLabel && (
-          <div className="app-header__badge">{pathLabel}</div>
+        {trackLabel && (
+          <div className="app-header__badge">{trackLabel}</div>
         )}
       </header>
 
@@ -89,7 +89,7 @@ export default function App() {
         {screen === SCREENS.LOADING && (
           <div className="loading">
             <div className="loading__spinner" />
-            <div className="loading__text">Building your network plan…</div>
+            <div className="loading__text">Assembling your build guide…</div>
           </div>
         )}
 

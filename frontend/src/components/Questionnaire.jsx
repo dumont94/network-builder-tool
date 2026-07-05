@@ -1,114 +1,53 @@
 /**
- * Questionnaire.jsx — The four input questions.
+ * Questionnaire.jsx — The entry screen.
  *
- * Renders a hero intro followed by four question blocks:
- *   1. Business type   (currently only Startup/Small Business is active)
- *   2. Team size       (1–10, 11–50, 51+)
- *   3. Budget          (Budget-Conscious vs. Enterprise)
- *   4. Management style (DIY vs. Fully Outsourced)
+ * One decision drives the whole guide: which platform are you building on,
+ * Cisco (IOS / IOS-XE) or Fortinet (FortiOS)? The rest of the tool is a
+ * step-by-step, CLI-first walkthrough of standing up a network on that
+ * platform, written to double as a study guide (CCNA / Fortinet NSE).
  *
- * A security posture info banner explains that all builds include
- * best-practice security — budget only changes the tooling, not
- * whether controls exist. This is an intentional design choice.
- *
- * To add a new business type: add an entry to BUSINESS_TYPES below,
- * remove the `disabled` flag, and ensure data.py includes it.
+ * To add a track: add an entry to TRACKS below and a matching "tracks" key
+ * in networkData.json.
  */
 
 import { useState } from "react";
 
 // ── Option data ───────────────────────────────────────────────────
 
-const BUSINESS_TYPES = [
+const TRACKS = [
   {
-    id: "startup",
-    label: "Startup / Small Business",
-    desc: "Growing team, tight budget, building from scratch",
-    disabled: false,
+    id: "cisco",
+    label: "Cisco",
+    desc: "IOS / IOS-XE · Catalyst switches · ISR routers — the CCNA-track build",
   },
   {
-    id: "enterprise",
-    label: "Enterprise",
-    desc: "Multi-site, compliance-driven, large IT team",
-    disabled: true,
-    soon: true,
-  },
-  {
-    id: "nonprofit",
-    label: "Non-Profit / Education",
-    desc: "Grant-funded, vendor discount programs",
-    disabled: true,
-    soon: true,
-  },
-];
-
-const SIZES = [
-  { id: "1-10",  label: "1–10 people",  desc: "Seed / early-stage" },
-  { id: "11-50", label: "11–50 people", desc: "Series A / growth" },
-  { id: "51+",   label: "51+ people",   desc: "Scaling up" },
-];
-
-const BUDGETS = [
-  {
-    id: "budget_conscious",
-    label: "Budget-Conscious",
-    desc: "Maximize value; lean on open-source and no-license gear where possible",
-  },
-  {
-    id: "enterprise",
-    label: "Enterprise-Grade",
-    desc: "Redundancy, full observability, room to scale — willing to invest",
-  },
-];
-
-const MANAGEMENT_STYLES = [
-  {
-    id: "diy",
-    label: "DIY — I'll manage it",
-    desc: "I want to learn, own the config, and run it myself (or with a small IT team)",
-  },
-  {
-    id: "outsourced",
-    label: "Fully Outsourced",
-    desc: "I want a managed service provider to deploy, monitor, and maintain everything",
+    id: "fortinet",
+    label: "Fortinet",
+    desc: "FortiOS · FortiGate NGFW · FortiSwitch — the FortiGate-centric build",
   },
 ];
 
 // ── Component ─────────────────────────────────────────────────────
 
 export default function Questionnaire({ onSubmit, error }) {
-  const [formData, setFormData] = useState({
-    businessType: "startup",
-    size: "1-10",
-    budget: "budget_conscious",
-    managementStyle: "diy",
-  });
-
-  function select(field, value) {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }
+  const [vendor, setVendor] = useState("cisco");
 
   function handleSubmit(e) {
     e.preventDefault();
-    // Map camelCase form state to snake_case API fields
-    onSubmit({
-      business_type:    formData.businessType,
-      size:             formData.size,
-      budget:           formData.budget,
-      management_style: formData.managementStyle,
-    });
+    onSubmit({ vendor });
   }
 
   return (
     <div className="questionnaire">
       {/* ── Hero ── */}
       <div className="questionnaire__hero">
-        <div className="questionnaire__eyebrow">Network Infrastructure Builder</div>
-        <h1 className="questionnaire__title">Map Your Network Infrastructure</h1>
+        <div className="questionnaire__eyebrow">Network Build Study Guide</div>
+        <h1 className="questionnaire__title">Stand Up a Network, Phase by Phase</h1>
         <p className="questionnaire__subtitle">
-          Answer four questions. Get a step-by-step guide to building a
-          real business network from scratch — including the gear, the config,
-          and the plain-English explanation of why it all matters.
+          Pick a platform and walk the full build — management, VLANs, routing,
+          NAT, firewall, HA, and VPN — with the real CLI, the commands to verify
+          each phase, and the pitfalls that cost you points and uptime. Built as
+          a study guide for network engineers.
         </p>
         <p className="questionnaire__byline">Built by Nigel Dumont</p>
       </div>
@@ -118,119 +57,49 @@ export default function Questionnaire({ onSubmit, error }) {
         <div className="error-card" style={{ marginBottom: "var(--space-8)" }}>
           <div className="error-card__icon">⚠</div>
           <div className="error-card__title">Something went wrong</div>
-          <div className="error-card__message">
-            {error}
-            <br /><br />
-            Make sure the Flask backend is running on port 5000:<br />
-            <code style={{ fontFamily: "var(--mono)", fontSize: "12px" }}>
-              cd backend && python app.py
-            </code>
-          </div>
+          <div className="error-card__message">{error}</div>
         </div>
       )}
 
       <form className="questionnaire__form" onSubmit={handleSubmit}>
 
-        {/* ── Q1: Business Type ── */}
+        {/* ── Q1: Platform / Track ── */}
         <div className="question-block">
           <div className="question-block__label">
             <span className="question-block__number">1</span>
-            Business Type
+            Platform
           </div>
-          <div className="question-block__title">What kind of business is this for?</div>
-          <div className="option-grid">
-            {BUSINESS_TYPES.map((bt) => (
-              <OptionCard
-                key={bt.id}
-                label={bt.label}
-                desc={bt.desc}
-                selected={formData.businessType === bt.id}
-                disabled={bt.disabled}
-                soon={bt.soon}
-                onClick={() => !bt.disabled && select("businessType", bt.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Q2: Size ── */}
-        <div className="question-block">
-          <div className="question-block__label">
-            <span className="question-block__number">2</span>
-            Team Size
-          </div>
-          <div className="question-block__title">How many people will use this network?</div>
-          <div className="option-grid">
-            {SIZES.map((s) => (
-              <OptionCard
-                key={s.id}
-                label={s.label}
-                desc={s.desc}
-                selected={formData.size === s.id}
-                onClick={() => select("size", s.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Q3: Budget ── */}
-        <div className="question-block">
-          <div className="question-block__label">
-            <span className="question-block__number">3</span>
-            Budget
-          </div>
-          <div className="question-block__title">What's the budget posture?</div>
+          <div className="question-block__title">Which platform are you building on?</div>
           <div className="option-grid option-grid--2col">
-            {BUDGETS.map((b) => (
+            {TRACKS.map((t) => (
               <OptionCard
-                key={b.id}
-                label={b.label}
-                desc={b.desc}
-                selected={formData.budget === b.id}
-                onClick={() => select("budget", b.id)}
+                key={t.id}
+                label={t.label}
+                desc={t.desc}
+                selected={vendor === t.id}
+                onClick={() => setVendor(t.id)}
               />
             ))}
           </div>
         </div>
 
-        {/* ── Q4: Security posture banner + Management style ── */}
-        <div className="question-block">
-          <div className="question-block__label">
-            <span className="question-block__number">4</span>
-            Management Style
-          </div>
-          <div className="question-block__title">How do you want to run it?</div>
-
-          {/* Security posture note — this is not a question, it's a statement */}
-          <div className="security-banner">
-            <div className="security-banner__icon">🔒</div>
-            <div>
-              <div className="security-banner__title">Security posture: always enterprise-grade</div>
-              <div className="security-banner__body">
-                Every build in this tool includes network segmentation (VLANs), encrypted wireless (WPA3),
-                firewall with IPS, and monitoring. There is no "low security" option. Budget only
-                determines <em>which tools</em> are used — not whether controls exist.
-              </div>
+        {/* ── Scope note — not a question, a statement of what you get ── */}
+        <div className="security-banner">
+          <div className="security-banner__icon">🖧</div>
+          <div>
+            <div className="security-banner__title">Same 10 phases, either platform</div>
+            <div className="security-banner__body">
+              This walks a single-site build in real deployment order. Both tracks
+              cover identical concepts — only the CLI and product names change — so
+              you can compare Cisco IOS and FortiOS side by side by running it twice.
             </div>
-          </div>
-
-          <div className="option-grid option-grid--2col">
-            {MANAGEMENT_STYLES.map((m) => (
-              <OptionCard
-                key={m.id}
-                label={m.label}
-                desc={m.desc}
-                selected={formData.managementStyle === m.id}
-                onClick={() => select("managementStyle", m.id)}
-              />
-            ))}
           </div>
         </div>
 
         {/* ── Submit ── */}
         <div className="questionnaire__submit">
           <button type="submit" className="btn btn--primary btn--lg btn--full">
-            Build My Network →
+            Start the Build →
           </button>
         </div>
 
@@ -241,18 +110,16 @@ export default function Questionnaire({ onSubmit, error }) {
 
 // ── OptionCard subcomponent ───────────────────────────────────────
 
-function OptionCard({ label, desc, selected, disabled, soon, onClick }) {
+function OptionCard({ label, desc, selected, onClick }) {
   const classes = [
     "option-card",
-    selected  ? "option-card--selected"  : "",
-    disabled  ? "option-card--disabled"  : "",
+    selected ? "option-card--selected" : "",
   ].filter(Boolean).join(" ");
 
   return (
-    <div className={classes} onClick={onClick} role="button" tabIndex={disabled ? -1 : 0}
-      onKeyDown={(e) => e.key === "Enter" && !disabled && onClick()}>
-      {soon && <span className="option-card__soon">Soon</span>}
-      {selected && !disabled && <span className="option-card__check" />}
+    <div className={classes} onClick={onClick} role="button" tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}>
+      {selected && <span className="option-card__check" />}
       <div className="option-card__title">{label}</div>
       <div className="option-card__desc">{desc}</div>
     </div>

@@ -1,79 +1,61 @@
 /**
- * StepCard.jsx — Renders a single build step with all its sections.
+ * StepCard.jsx — Renders a single build phase as a study-guide entry.
  *
- * Each section is color-coded by purpose so a reader can scan quickly:
- *   Blue   — What is this?  (plain-English explanation)
- *   Amber  — Why you need it (business justification)
- *   Green  — Recommended products (the "buy" section)
- *   Gray   — Alternatives & trade-offs
- *   Red    — Patching / licensing notes (the "don't forget" section)
- *   Purple — Configuration steps (the hands-on part)
+ * Sections, color-coded so a reader can scan quickly:
+ *   Blue   — Concept (what this phase is)
+ *   Amber  — Where it fits in the build (why it matters)
+ *   Purple — Configuration (the vendor CLI, in a monospace code block)
+ *   Green  — Verify it works (show / get / diagnose commands)
+ *   Red    — Common pitfalls (the mistakes that break it)
+ *   Gray   — Study notes (cert-relevant context: CCNA / Fortinet NSE)
  *
- * Sections with no content (e.g. empty alternatives list) render a
- * tasteful "no alternatives listed" note rather than an empty card.
+ * CLI arrays render as code blocks. Lines beginning with "!" (Cisco) or
+ * "#" (annotation) are treated as comments and dimmed.
  */
 
-export default function StepCard({ step }) {
+export default function StepCard({ step, total }) {
   return (
     <div className="step-card">
 
       {/* ── Header ── */}
       <div className="step-card__header">
-        <span className="step-card__num">Step {step.order} of 10</span>
+        <span className="step-card__num">Phase {step.order} of {total}</span>
         <h2 className="step-card__title">{step.title}</h2>
       </div>
 
-      {/* ── What is this? ── */}
-      <Section modifier="what" icon="●" title="What Is This?">
+      {/* ── Concept ── */}
+      <Section modifier="what" icon="●" title="Concept">
         <p className="section__text">{step.what}</p>
       </Section>
 
-      {/* ── Why you need it ── */}
-      <Section modifier="why" icon="◆" title="Why You Need It">
+      {/* ── Where it fits ── */}
+      <Section modifier="why" icon="◆" title="Where It Fits in the Build">
         <p className="section__text">{step.why}</p>
       </Section>
 
-      {/* ── Recommended products ── */}
-      <Section modifier="products" icon="✓" title="Recommended for Your Build">
-        <div className="product-list">
-          {step.products.map((product, i) => (
-            <ProductCard key={i} product={product} />
+      {/* ── Configuration (CLI) ── */}
+      <Section modifier="config" icon="#" title="Configuration">
+        {step.gear && <div className="cli-gear">{step.gear}</div>}
+        <CodeBlock lines={step.cli} />
+      </Section>
+
+      {/* ── Verify ── */}
+      <Section modifier="products" icon="✓" title="Verify It Works">
+        <CodeBlock lines={step.verify} />
+      </Section>
+
+      {/* ── Common pitfalls ── */}
+      <Section modifier="patch" icon="⚠" title="Common Pitfalls">
+        <ul className="pitfall-list">
+          {step.pitfalls.map((p, i) => (
+            <li key={i} className="pitfall-item">{p}</li>
           ))}
-        </div>
+        </ul>
       </Section>
 
-      {/* ── Alternatives ── */}
-      <Section modifier="alts" icon="⇄" title="Alternatives & Trade-offs">
-        {step.alternatives.length > 0 ? (
-          <div className="alt-list">
-            {step.alternatives.map((alt, i) => (
-              <div key={i} className="alt-item">
-                <div className="alt-item__name">{alt.name}</div>
-                <div className="alt-item__comparison">{alt.comparison}</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-alts">
-            No direct alternatives — the recommended product is the standard approach for this path.
-          </p>
-        )}
-      </Section>
-
-      {/* ── Patching / licensing notes ── */}
-      <Section modifier="patch" icon="⚠" title="Patching, Licensing & Renewal Notes">
-        <p className="section__text">{step.patching_notes}</p>
-      </Section>
-
-      {/* ── Configuration steps ── */}
-      <Section modifier="config" icon="#" title="Configuration Steps">
-        <ol className="config-steps">
-          {step.config_steps.map((s, i) => (
-            <li key={i} className="config-step">
-              <span className="config-step__text">{s}</span>
-            </li>
-          ))}
-        </ol>
+      {/* ── Study notes ── */}
+      <Section modifier="alts" icon="✱" title="Study Notes">
+        <p className="section__text">{step.study}</p>
       </Section>
 
     </div>
@@ -96,19 +78,26 @@ function Section({ modifier, icon, title, children }) {
   );
 }
 
-// ── ProductCard subcomponent ─────────────────────────────────────
+// ── CodeBlock subcomponent ───────────────────────────────────────
+// Renders an array of CLI lines. Comment lines (starting with ! or #)
+// are dimmed so the actual commands stand out.
 
-function ProductCard({ product }) {
+function CodeBlock({ lines }) {
+  if (!lines || lines.length === 0) return null;
   return (
-    <div className="product-card">
-      <div className="product-card__role">{product.role}</div>
-      <div className="product-card__top">
-        <div className="product-card__name">{product.name}</div>
-        <div className="product-card__price">{product.price}</div>
-      </div>
-      {product.note && (
-        <div className="product-card__note">{product.note}</div>
-      )}
-    </div>
+    <pre className="cli-block">
+      {lines.map((line, i) => {
+        const trimmed = line.trimStart();
+        const isComment = trimmed.startsWith("!") || trimmed.startsWith("#");
+        return (
+          <span
+            key={i}
+            className={`cli-line${isComment ? " cli-line--comment" : ""}`}
+          >
+            {line || " "}
+          </span>
+        );
+      })}
+    </pre>
   );
 }

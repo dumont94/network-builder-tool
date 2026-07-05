@@ -21,7 +21,7 @@ export default function Walkthrough({
   onStepChange,
   onComplete,
 }) {
-  const { steps, path_info } = recommendation;
+  const { steps, track_info } = recommendation;
   const step = steps[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === steps.length - 1;
@@ -50,7 +50,7 @@ export default function Walkthrough({
       <div className="walkthrough">
         {/* ── Left: step list sidebar ── */}
         <aside className="step-list">
-          <div className="step-list__path">{path_info.name}</div>
+          <div className="step-list__path">{track_info.name} track</div>
           {steps.map((s, i) => {
             const isDone   = i < currentStep;
             const isActive = i === currentStep;
@@ -81,7 +81,7 @@ export default function Walkthrough({
 
         {/* ── Right: current step content ── */}
         <div>
-          <StepCard step={step} />
+          <StepCard step={step} total={steps.length} />
 
           {/* Navigation */}
           <div className="step-nav">
