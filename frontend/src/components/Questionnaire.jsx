@@ -44,10 +44,8 @@ export default function Questionnaire({ onSubmit, error }) {
         <div className="questionnaire__eyebrow">Network Builder Tool</div>
         <h1 className="questionnaire__title">Build Your Network</h1>
         <p className="questionnaire__subtitle">
-          Pick a platform and I'll walk you through the whole build — management,
-          VLANs, routing, NAT, firewall, HA, and VPN — with the exact CLI I'd
-          run, the commands to verify each step, and the pitfalls I've learned to
-          avoid. Everything here is how I actually stand a network up.
+          Pick a platform and I'll walk you through standing up a network — the
+          exact CLI for every step, how to verify it, and the pitfalls to avoid.
         </p>
         <p className="questionnaire__byline">Built by Nigel Dumont · Network Engineer</p>
       </div>
