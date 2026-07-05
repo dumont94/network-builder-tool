@@ -43,10 +43,6 @@ export default function Questionnaire({ onSubmit, error }) {
       <div className="questionnaire__hero">
         <div className="questionnaire__eyebrow">Network Builder Tool</div>
         <h1 className="questionnaire__title">Build Your Network</h1>
-        <p className="questionnaire__subtitle">
-          Pick a platform and I'll walk you through standing up a network — the
-          exact CLI for every step, how to verify it, and the pitfalls to avoid.
-        </p>
         <p className="questionnaire__byline">Built by Nigel Dumont · Network Engineer</p>
       </div>
 
