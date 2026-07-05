@@ -807,6 +807,70 @@ body {
   font-family: var(--mono);
 }
 
+/* CLI code blocks (Configuration + Verify sections) */
+.cli-gear {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  margin-bottom: var(--space-3);
+  line-height: 1.5;
+}
+
+.cli-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+}
+
+.cli-line {
+  color: var(--text);
+  white-space: pre;
+}
+
+.cli-line--comment {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Give the "Verify" block a subtly different accent from config */
+.section--products .cli-line { color: var(--accent); }
+.section--products .cli-line--comment { color: var(--text-dim); }
+
+/* Pitfalls list */
+.pitfall-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.pitfall-item {
+  position: relative;
+  padding-left: var(--space-5);
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.pitfall-item::before {
+  content: '\2717';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* Study notes icon color */
+.section--alts .section__title { color: var(--text-muted); }
+
 /* Step navigation */
 .step-nav {
   display: flex;

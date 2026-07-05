@@ -1,29 +1,28 @@
 """
-app.py — Flask API for the SOHO Network Builder.
+app.py — Flask API for the Network Builder Tool.
 
 Routes:
-  GET  /api/health     — liveness check (useful for Docker/k8s health probes)
-  POST /api/recommend  — accepts questionnaire answers, returns full build plan
+  GET  /api/health   — liveness check (useful for Docker/k8s health probes)
+  GET  /api/tracks   — list available platform tracks (cisco, fortinet)
+  POST /api/build    — accepts a track choice, returns the full build
 
 Design decisions:
   - CORS is enabled for all origins in development. In production, restrict
     origins to your actual domain via the CORS_ORIGINS env var.
-  - All recommendation logic lives in recommendations.py, not here.
-    This file is intentionally thin — just HTTP plumbing.
+  - All content lives in frontend/src/networkData.json (loaded by data.py),
+    shared with the React app so the two never drift.
   - No database. All state lives in the request/response cycle.
+
+Note: the React app runs entirely client-side off networkData.json, so this
+API is optional — it exists for programmatic access and parity.
 """
 
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from recommendations import (
-    build_recommendation,
-    VALID_BUSINESS_TYPES,
-    VALID_SIZES,
-    VALID_BUDGETS,
-    VALID_MANAGEMENT_STYLES,
-)
+from data import TRACKS
+from recommendations import build_recommendation, VALID_TRACKS
 
 app = Flask(__name__)
 
@@ -39,27 +38,28 @@ def health():
     return jsonify({"status": "ok"})
 
 
-@app.route("/api/recommend", methods=["POST"])
-def recommend():
+@app.route("/api/tracks")
+def tracks():
+    """Return the available platform tracks and their metadata."""
+    return jsonify({"tracks": TRACKS})
+
+
+@app.route("/api/build", methods=["POST"])
+def build():
     """
-    Accept questionnaire answers and return a complete network build plan.
+    Accept a track choice and return the complete build.
 
     Request body (JSON):
-      {
-        "business_type":    "startup",
-        "size":             "1-10" | "11-50" | "51+",
-        "budget":           "budget_conscious" | "enterprise",
-        "management_style": "diy" | "outsourced"
-      }
+      { "vendor": "cisco" | "fortinet" }
 
     Response (JSON):
       {
-        "path":      "budget_diy" | "enterprise_diy" | "outsourced",
-        "path_info": { name, tagline, audience, year1_cost, recurring_cost, description },
-        "steps":     [ { id, order, title, icon, what, why, products, alternatives,
-                         patching_notes, config_steps } × 10 ],
-        "sources":   [ { vendor, url, note } × 7 ],
-        "inputs":    { original questionnaire answers }
+        "track":      "cisco" | "fortinet",
+        "track_info": { name, tagline, gear, focus, description },
+        "steps":      [ { id, order, title, icon, what, why, gear,
+                          cli, verify, pitfalls, study } x 10 ],
+        "sources":    [ { vendor, url, note } ... ],
+        "inputs":     { vendor }
       }
     """
     data = request.get_json(silent=True)
@@ -67,34 +67,16 @@ def recommend():
     if not data:
         return jsonify({"error": "Request body must be JSON."}), 400
 
-    # Validate all required fields are present
-    required_fields = ["business_type", "size", "budget", "management_style"]
-    missing = [f for f in required_fields if f not in data]
-    if missing:
-        return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+    if "vendor" not in data:
+        return jsonify({"error": "Missing required field: vendor"}), 400
 
-    # Validate field values against the allowed set
-    validation_errors = []
-    if data["business_type"] not in VALID_BUSINESS_TYPES:
-        validation_errors.append(f"business_type must be one of: {VALID_BUSINESS_TYPES}")
-    if data["size"] not in VALID_SIZES:
-        validation_errors.append(f"size must be one of: {VALID_SIZES}")
-    if data["budget"] not in VALID_BUDGETS:
-        validation_errors.append(f"budget must be one of: {VALID_BUDGETS}")
-    if data["management_style"] not in VALID_MANAGEMENT_STYLES:
-        validation_errors.append(f"management_style must be one of: {VALID_MANAGEMENT_STYLES}")
+    if data["vendor"] not in VALID_TRACKS:
+        return jsonify({
+            "error": "Invalid track.",
+            "details": f"vendor must be one of: {VALID_TRACKS}",
+        }), 400
 
-    if validation_errors:
-        return jsonify({"error": "Invalid field values.", "details": validation_errors}), 400
-
-    result = build_recommendation(
-        business_type=data["business_type"],
-        size=data["size"],
-        budget=data["budget"],
-        management_style=data["management_style"],
-    )
-
-    return jsonify(result)
+    return jsonify(build_recommendation(vendor=data["vendor"]))
 
 
 if __name__ == "__main__":

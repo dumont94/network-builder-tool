@@ -1,63 +1,32 @@
 """
-recommendations.py — Recommendation engine.
+recommendations.py — Assembles the build payload for a chosen track.
 
-Routes questionnaire answers to one of three build paths and assembles
-the full response payload. Keeping this logic in its own module (separate
-from app.py and data.py) makes it easy to unit-test the routing rules
-without spinning up the Flask server.
+The tool takes a single input: the vendor track (cisco | fortinet). This module
+flattens each build step down to the selected track's guidance so the API
+response never exposes the nested tracks structure. Mirrors the client-side
+logic in frontend/src/recommendations.js.
 """
 
-from data import PATHS, BUILD_STEPS, SOURCES
+from data import TRACKS, BUILD_STEPS, SOURCES
+
+# Valid values — used for input validation in app.py
+VALID_TRACKS = list(TRACKS.keys())  # ["cisco", "fortinet"]
 
 
-# Valid values for each field — used for input validation in app.py
-VALID_BUSINESS_TYPES = ["startup"]
-VALID_SIZES = ["1-10", "11-50", "51+"]
-VALID_BUDGETS = ["budget_conscious", "enterprise"]
-VALID_MANAGEMENT_STYLES = ["diy", "outsourced"]
-
-
-def determine_path(business_type: str, size: str, budget: str, management_style: str) -> str:
-    """
-    Route questionnaire answers to one of the three build paths.
-
-    Routing logic:
-      outsource flag → outsourced  (management preference overrides budget)
-      enterprise budget → enterprise_diy
-      budget_conscious → budget_diy
-
-    Adding a new path: add it to PATHS in data.py, then add a branch here.
-    """
-    if management_style == "outsourced":
-        return "outsourced"
-    if budget == "enterprise":
-        return "enterprise_diy"
-    return "budget_diy"
-
-
-def build_recommendation(
-    business_type: str,
-    size: str,
-    budget: str,
-    management_style: str,
-) -> dict:
-    """
-    Assemble a complete recommendation payload for the frontend.
+def build_recommendation(vendor: str) -> dict:
+    """Assemble a complete build payload for the frontend/API.
 
     Returns a dict containing:
-      path         — the selected path ID
-      path_info    — metadata about that path (name, costs, description)
-      steps        — 10 build steps with path-specific products and guidance
-      sources      — vendor links for the summary screen
+      track       — the selected track ID
+      track_info  — metadata about that track (name, tagline, gear, focus, desc)
+      steps       — 10 build steps with the track-specific cli/verify/etc.
+      sources     — vendor doc + reference links
     """
-    path_id = determine_path(business_type, size, budget, management_style)
-    path_info = PATHS[path_id]
+    track_info = TRACKS[vendor]
 
-    # Surface the path-specific recommendation for each step at the top level
-    # so the frontend doesn't need to know about the recommendations dict structure.
     steps = []
     for step in BUILD_STEPS:
-        path_rec = step["recommendations"][path_id]
+        track_step = step["tracks"][vendor]
         steps.append({
             "id": step["id"],
             "order": step["order"],
@@ -65,22 +34,17 @@ def build_recommendation(
             "icon": step["icon"],
             "what": step["what"],
             "why": step["why"],
-            "products": path_rec["products"],
-            "alternatives": path_rec["alternatives"],
-            "patching_notes": path_rec["patching_notes"],
-            "config_steps": path_rec["config_steps"],
+            "gear": track_step["gear"],
+            "cli": track_step["cli"],
+            "verify": track_step["verify"],
+            "pitfalls": track_step["pitfalls"],
+            "study": track_step["study"],
         })
 
     return {
-        "path": path_id,
-        "path_info": path_info,
+        "track": vendor,
+        "track_info": track_info,
         "steps": steps,
         "sources": SOURCES,
-        # Echo the inputs back so the frontend can display a summary of choices
-        "inputs": {
-            "business_type": business_type,
-            "size": size,
-            "budget": budget,
-            "management_style": management_style,
-        },
+        "inputs": {"vendor": vendor},
     }

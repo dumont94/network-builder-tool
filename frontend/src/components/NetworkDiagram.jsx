@@ -1,82 +1,70 @@
 /**
- * NetworkDiagram.jsx — ASCII-style network topology diagram.
+ * NetworkDiagram.jsx — ASCII-style topology for the chosen track.
  *
- * The diagram is path-specific: Budget shows simpler gear labels,
- * Enterprise shows the dual-ISP / redundant switch configuration,
- * Outsourced labels everything as MSP-managed with Meraki branding.
- *
- * Rendered in a <pre> block with Space Mono for perfect character alignment.
- * The integration steps list below the diagram walks through how the
- * physical connections are made in sequential order.
+ * Rendered in a <pre> with Space Mono for perfect character alignment.
+ * The build-order recap below walks how the phases connect end to end.
  */
 
-// Path-specific diagram strings — plain text, Space Mono ensures alignment
 const DIAGRAMS = {
-  budget_diy: `
-  [Comcast/AT&T Business]  ──┐
-                             ├──►  [FortiGate 40F]  ──►  [UniFi SW Lite 8 PoE]  ──►  [U7 Lite APs  ×2]
-  [5G LTE / Inseego MiFi]  ──┘         SD-WAN                    │                           │
-                                                          [Wired Desks / Devices]       [WiFi Clients]
-                                                                  │
-                                                    [SolarWinds Observability (free)]
-                                                                  │
-                                                    [UniFi Dashboard + FortiCloud]
+  cisco: `
+              [ ISP ]  203.0.113.1
+                  |  Gi0/1  (ip nat outside)
+         +--------+---------+
+         |   IOS-XE Router  |   OSPF area 0 . PAT . IKEv2 IPsec
+         +--------+---------+
+                  |  Gi0/24  802.1Q trunk (10,20,30,99)
+         +--------+---------+
+         |  Catalyst L3 SW  |   SVIs . DHCP . HSRP . RSTP
+         +--+-----+-----+--++
+            |     |     |   |
+         VLAN10 VLAN20 VLAN30 VLAN99
+          DATA  VOICE  GUEST  MGMT
 `,
-  enterprise_diy: `
-  [Comcast Business 1 Gbps]  ──┐
-                               ├──►  [PA-400 / FortiGate 60F]  ──►  [UniFi Pro Max 24 PoE  ×2]  ──►  [U7 Pro APs  ×4]
-  [Verizon Fios 500 Mbps]  ────┤          SD-WAN + NGFW                    │  LAG                           │
-                               │                                    [7 VLANs / QoS]               [WiFi Clients]
-  [5G LTE Tertiary Backup]  ───┘       802.1X RADIUS                       │
-                                       SSL Inspection             [Wired Devices]
-                                              │
-                                 [SolarWinds NPM + Cortex XDR]
-                                              │
-                                 [FortiAnalyzer / Palo Alto Panorama]
-`,
-  outsourced: `
-  [ISP 1  (MSP-selected)]  ──┐
-                             ├──►  [Meraki MX  (cloud-managed)]  ──►  [Meraki MS Switch]  ──►  [Meraki MR APs]
-  [ISP 2  (MSP-selected)]  ──┤         SD-WAN / NGFW                        │                       │
-                             │       Meraki Dashboard                 [VLANs + QoS]          [WiFi Clients]
-  [5G Failover  (MSP)]  ─────┘                                               │
-                                                                    [Wired Devices]
-                                          │
-                              [MSP 24/7 Monitoring  (SolarWinds / Datto)]
-                                          │
-                              [MSP Support Desk  — 1-hr SLA]
+  fortinet: `
+              [ ISP ]  203.0.113.1
+                  |  wan1
+         +--------+---------+
+         |    FortiGate     |   Policy+NAT . OSPF . IPsec/SSL-VPN
+         |    (FGCP a-p)    |
+         +--------+---------+
+                  |  FortiLink (LACP lag1)
+         +--------+---------+
+         |    FortiSwitch   |   VLANs 10/20/30/99
+         +--+-----+-----+--++
+            |     |     |   |
+         vlan10 vlan20 vlan30 vlan99
+          DATA  VOICE  GUEST  MGMT
 `,
 };
 
-// Integration steps that describe the physical wiring sequence
-const INTEGRATION_STEPS = [
-  "Both primary ISPs terminate into the dual-WAN firewall (FortiGate / Palo Alto / Meraki MX).",
-  "The 5G/LTE modem connects into the firewall's WAN3 or dedicated cellular port.",
-  "The firewall monitors WAN health via ping probes; failover triggers automatically when a link degrades past the configured SLA threshold.",
-  "The firewall's LAN port connects to the switch's uplink via a 1G or multi-gig link (tagged trunk carrying all VLANs).",
-  "The switch delivers PoE power and data to APs and wired devices across all VLAN segments.",
-  "VLANs are tagged on the switch trunk and enforced by the firewall's inter-VLAN security policies.",
-  "The monitoring agent (SolarWinds / Meraki-native / FortiAnalyzer) collects device metrics via SNMP v3 and syslog.",
-  "Everything is managed from a single dashboard: UniFi Cloud / Meraki Dashboard / FortiCloud / Palo Alto Strata.",
+// Build-order recap — generic across both tracks
+const BUILD_ORDER = [
+  "Plan the addressing and VLAN map, then secure device management (SSH/HTTPS, admin creds, mgmt interface).",
+  "Create VLANs and an 802.1Q trunk so one switch carries several isolated segments up to the routing layer.",
+  "Give each VLAN a gateway (SVI or sub-interface) and a DHCP scope so endpoints get addressed automatically.",
+  "Add a default route to the ISP and run OSPF internally so L3 devices learn each other's subnets.",
+  "Translate private addresses to the public IP with PAT, and publish only the services you must with DNAT/VIP.",
+  "Enforce segmentation with ACLs / firewall policies and harden Layer 2 (port-security, DHCP snooping).",
+  "Remove single points of failure with STP, EtherChannel/LAG, and gateway/appliance redundancy (HSRP / FGCP).",
+  "Extend the network securely with IPsec site-to-site and remote-access VPN.",
+  "Prove it with ping/traceroute and show/get commands, then wire up NTP, syslog, and SNMP for monitoring.",
 ];
 
-export default function NetworkDiagram({ pathId }) {
-  const diagram = DIAGRAMS[pathId] || DIAGRAMS.budget_diy;
+export default function NetworkDiagram({ track }) {
+  const diagram = DIAGRAMS[track] || DIAGRAMS.cisco;
 
   return (
     <div className="diagram-section">
-      <div className="diagram-section__title">Network Topology</div>
+      <div className="diagram-section__title">Reference Topology</div>
 
-      {/* ASCII diagram */}
       <div className="diagram-container">
         <pre className="diagram-pre">{diagram}</pre>
       </div>
 
-      {/* Integration walkthrough */}
       <div style={{ marginTop: "var(--space-6)" }}>
-        <div className="diagram-section__title">How It All Connects</div>
+        <div className="diagram-section__title">Build Order Recap</div>
         <ol className="integration-steps">
-          {INTEGRATION_STEPS.map((step, i) => (
+          {BUILD_ORDER.map((step, i) => (
             <li key={i} className="integration-step">
               <span className="integration-step__text">{step}</span>
             </li>
